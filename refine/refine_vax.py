@@ -1,5 +1,4 @@
 import pandas as pd
-import json
 
 path = "../raw/"
 file = path+"vax_train.csv"
@@ -7,16 +6,11 @@ file = path+"vax_train.csv"
 dataX = pd.read_csv(file).T.to_dict()
 
 data = {}
-for x in dataX.values():
-    ys = x["label"]
-    if ys == "AntiVax": y = 0
-    elif ys == "Neutral": y = 1
-    elif ys == "ProVax": y = 2
-    else:
-        print(f"ys = {ys}\ndisaster")
-        break
-    data[str(x['id'])] = {"tweet":x['tweet'],
-                     "y": y}
+for i, x in enumerate(dataX.values()):
+    y = {"tweet": x['tweet'], "AntiVax": 0, "Neutral": 0, "ProVax": 0}
+    y[x["label"]] = 1
+    data[i] = y
 
-with open("../vax/data/data.json", "w") as f:
-    json.dump(data, f)
+data = pd.DataFrame(data).T
+# print(data.head())
+data.to_csv("../vax/data/data.csv", index=False)
